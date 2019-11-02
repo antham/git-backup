@@ -30,40 +30,40 @@
 (require 'cl-lib)
 (require 's)
 
-(defun git-backup-version-file (git-backup-git-binary git-backup-path git-backup-excluded-entries filename)
+(defun git-backup-version-file (git-binary-path backup-path excluded-entry-paths filename)
   "Version file using FILENAME in backup repository."
   (when (and filename
              (file-name-absolute-p filename)
              (file-exists-p filename)
-             (not (git-backup--file-excluded-p git-backup-excluded-entries filename)))
-    (git-backup--init-git-repository git-backup-git-binary git-backup-path)
-    (git-backup--copy-file-to-repository git-backup-path filename)
-    (git-backup--exec-git-command git-backup-git-binary git-backup-path (list "add" (git-backup--transform-filename-for-git filename)) t)
-    (git-backup--exec-git-command git-backup-git-binary git-backup-path '("commit" "-m" "backup") t)
+             (not (git-backup--file-excluded-p excluded-entry-paths filename)))
+    (git-backup--init-git-repository git-binary-path backup-path)
+    (git-backup--copy-file-to-repository backup-path filename)
+    (git-backup--exec-git-command git-binary-path backup-path (list "add" (git-backup--transform-filename-for-git filename)) t)
+    (git-backup--exec-git-command git-binary-path backup-path '("commit" "-m" "backup") t)
     t))
 
 (defun git-backup-clean-repository ()
   "Clean repository running gc."
   (git-backup--exec-git-command (list "gc") t))
 
-(defun git-backup-remove-file-backups (git-backup-git-binary git-backup-path filename)
+(defun git-backup-remove-file-backups (git-binary-path backup-path filename)
   "Remove all history associated with FILENAME."
-  (git-backup--remove-file-history git-backup-git-binary git-backup-path filename)
-  (git-backup--remove-file git-backup-path filename))
+  (git-backup--remove-file-history git-binary-path backup-path filename)
+  (git-backup--remove-file backup-path filename))
 
-(defun git-backup--init-git-repository (git-backup-git-binary git-backup-path)
+(defun git-backup--init-git-repository (git-binary-path backup-path)
   "Initialize git repository."
   (unless (file-directory-p
-           git-backup-path)
-    (call-process git-backup-git-binary nil nil nil "init" git-backup-path)
-    (git-backup--exec-git-command git-backup-git-binary git-backup-path (list "config" "--local" "user.email" "noemail@noemail.com"))
-    (git-backup--exec-git-command git-backup-git-binary git-backup-path (list "config" "--local" "user.name" "noname"))))
+           backup-path)
+    (call-process git-binary-path nil nil nil "init" backup-path)
+    (git-backup--exec-git-command git-binary-path backup-path (list "config" "--local" "user.email" "noemail@noemail.com"))
+    (git-backup--exec-git-command git-binary-path backup-path (list "config" "--local" "user.name" "noname"))))
 
-(defun git-backup--exec-git-command (git-backup-git-binary git-backup-path command &optional strip-last-newline)
+(defun git-backup--exec-git-command (git-binary-path backup-path command &optional strip-last-newline)
   "Execute a git COMMAND inside backup repository, optionally STRIP-LAST-NEWLINE."
-  (when (file-directory-p (expand-file-name ".git" git-backup-path))
-    (let* ((default-directory git-backup-path)
-           (output (shell-command-to-string (combine-and-quote-strings (append (list git-backup-git-binary) command)))))
+  (when (file-directory-p (expand-file-name ".git" backup-path))
+    (let* ((default-directory backup-path)
+           (output (shell-command-to-string (combine-and-quote-strings (append (list git-binary-path) command)))))
       (if strip-last-newline
           (s-chomp output)
           output))))
@@ -74,52 +74,52 @@
              (file-name-absolute-p filename))
     (substring filename 1)))
 
-(defun git-backup--copy-file-to-repository (git-backup-path filename)
+(defun git-backup--copy-file-to-repository (backup-path filename)
   "Create folder in repository and copy file using FILENAME in it."
-  (let ((directory (concat git-backup-path (file-name-directory filename))))
+  (let ((directory (concat backup-path (file-name-directory filename))))
     (make-directory directory t)
     (copy-file filename directory t t t)))
 
-(defun git-backup--remove-file (git-backup-path filename)
+(defun git-backup--remove-file (backup-path filename)
   "Remove FILENAME from repository."
-  (let ((f (concat git-backup-path filename)))
+  (let ((f (concat backup-path filename)))
     (when (file-exists-p f)
       (delete-file f))))
 
-(defun git-backup--file-excluded-p (git-backup-excluded-entries filename)
+(defun git-backup--file-excluded-p (excluded-entry-paths filename)
   "Check if a FILENAME is excluded from backup."
   (cl-some (lambda (regexp) (string-match-p (concat "\\`" regexp "\\'") filename))
-           git-backup-excluded-entries))
+           excluded-entry-paths))
 
-(defun git-backup--list-file-change-time (git-backup-git-binary git-backup-path git-backup-list-format filename)
+(defun git-backup--list-file-change-time (git-binary-path backup-path git-output-format filename)
   "Build assoc list using commit id and message rendering format using FILENAME."
   (let ((filename-for-git (git-backup--transform-filename-for-git filename)))
     (when (and filename
-               (string= (s-chop-suffixes '("\0") (git-backup--exec-git-command git-backup-git-binary git-backup-path (list "ls-files" "-z" filename-for-git) t))
+               (string= (s-chop-suffixes '("\0") (git-backup--exec-git-command git-binary-path backup-path (list "ls-files" "-z" filename-for-git) t))
                         filename-for-git) t)
       (cl-mapcar #'cons
-                 (split-string (git-backup--exec-git-command git-backup-git-binary git-backup-path (list "log" (format
+                 (split-string (git-backup--exec-git-command git-binary-path backup-path (list "log" (format
                                                                           "--pretty=format:%s"
-                                                                          git-backup-list-format)
+                                                                          git-output-format)
                                                                    filename-for-git) t) "\n")
-                 (split-string (git-backup--exec-git-command git-backup-git-binary git-backup-path (list "log" "--pretty=format:%h"
+                 (split-string (git-backup--exec-git-command git-binary-path backup-path (list "log" "--pretty=format:%h"
                                                                    filename-for-git) t) "\n")))))
 
-(defun git-backup--fetch-backup-file (git-backup-git-binary git-backup-path commit-id filename)
+(defun git-backup--fetch-backup-file (git-binary-path backup-path commit-id filename)
   "Retrieve content file from backup repository using COMMIT-ID and FILENAME."
   (let ((filename-for-git (git-backup--transform-filename-for-git filename)))
     (when (and commit-id
                filename
-               (not (string= (git-backup--exec-git-command git-backup-git-binary git-backup-path (list "log" "--ignore-missing" "-1"
+               (not (string= (git-backup--exec-git-command git-binary-path backup-path (list "log" "--ignore-missing" "-1"
                                                                  commit-id "--" filename-for-git) t)
                              "")))
-      (git-backup--exec-git-command git-backup-git-binary git-backup-path (list "show" (concat commit-id ":" filename-for-git))))))
+      (git-backup--exec-git-command git-binary-path backup-path (list "show" (concat commit-id ":" filename-for-git))))))
 
-(defun git-backup--create-backup-buffer (git-backup-git-binary git-backup-path commit-id filename)
+(defun git-backup--create-backup-buffer (git-binary-path backup-path commit-id filename)
   "Create a buffer using chosen backup using COMMIT-ID and FILENAME."
-  (let ((data (git-backup--fetch-backup-file git-backup-git-binary git-backup-path commit-id filename)))
+  (let ((data (git-backup--fetch-backup-file git-binary-path backup-path commit-id filename)))
     (when data
-      (let ((buffer (get-buffer-create (concat filename " | " (git-backup--exec-git-command git-backup-git-binary git-backup-path (list
+      (let ((buffer (get-buffer-create (concat filename " | " (git-backup--exec-git-command git-binary-path backup-path (list
                                                                                              "diff-tree"
                                                                                              "-s"
                                                                                              "--pretty=format:%cd"
@@ -133,9 +133,9 @@
           (set-buffer-modified-p nil)
           buffer)))))
 
-(defun git-backup--remove-file-history (git-backup-git-binary git-backup-path filename)
+(defun git-backup--remove-file-history (git-binary-path backup-path filename)
   "Remove commits history for FILENAME."
-  (git-backup--exec-git-command git-backup-git-binary git-backup-path (list "filter-branch"
+  (git-backup--exec-git-command git-binary-path backup-path (list "filter-branch"
                                       "--force"
                                       "--index-filter"
                                       "'"
@@ -153,7 +153,7 @@
 
 (defun git-backup--open-in-new-buffer (git-backup--create-backup-buffer commit-id filename)
   "Open backup in new buffer using COMMIT-ID and FILENAME."
-  (let ((backup-buffer (git-backup--create-backup-buffer git-backup-git-binary backup-folder-test-repository commit-id filename)))
+  (let ((backup-buffer (git-backup--create-backup-buffer git-binary-path backup-folder-test-repository commit-id filename)))
     (switch-to-buffer backup-buffer)))
 
 (defun git-backup--replace-current-buffer (commit-id filename)
@@ -163,7 +163,7 @@
 
 (defun git-backup--create-ediff (commit-id buffer)
   "Create a ediff buffer with backup using COMMIT-ID and existing BUFFER."
-  (let ((backup-buffer (git-backup--create-backup-buffer git-backup-git-binary backup-folder-test-repository commit-id (buffer-file-name buffer))))
+  (let ((backup-buffer (git-backup--create-backup-buffer git-binary-path backup-folder-test-repository commit-id (buffer-file-name buffer))))
     (ediff-buffers (buffer-name backup-buffer)
                    (buffer-name buffer))))
 
