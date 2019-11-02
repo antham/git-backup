@@ -1,6 +1,6 @@
 (source melpa)
 
-(package-file "helm-backup.el")
+(package-file "git-backup.el")
 
 (development
  (depends-on "ert-runner")
