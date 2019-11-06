@@ -106,13 +106,13 @@
   (test-wrapper
    (lambda ()
      ;; nil value
-     (should (eq (git-backup--list-file-change-time git-binary-path backup-path git-output-format nil) nil))
+     (should (eq (git-backup-list-file-change-time git-binary-path backup-path git-output-format nil) nil))
      ;; non existing repository
-     (should (eq (git-backup--list-file-change-time git-binary-path backup-path git-output-format "/fake-file") nil))
+     (should (eq (git-backup-list-file-change-time git-binary-path backup-path git-output-format "/fake-file") nil))
      ;; add several modifications to a file
      (call-process-shell-command git-binary-path nil nil nil "init" backup-folder-test-repository)
      ;; non existing file in repository
-     (should (eq (git-backup--list-file-change-time git-binary-path backup-path git-output-format "/fake-file") nil))
+     (should (eq (git-backup-list-file-change-time git-binary-path backup-path git-output-format "/fake-file") nil))
      ;; add a file, change and version it several time
      (write-region "" nil (concat backup-folder-test-repository "/fake-file") nil 'nomessage)
      (shell-command (combine-and-quote-strings (list "cd" backup-folder-test-repository "&&" git-binary-path "add" "fake-file" "&&" git-binary-path "commit" "-m" "' '")))
@@ -120,8 +120,8 @@
      (shell-command (combine-and-quote-strings (list "cd" backup-folder-test-repository "&&" git-binary-path "add" "fake-file" "&&" git-binary-path "commit" "-m" "' '")))
      (write-region "data data" nil (concat backup-folder-test-repository "/fake-file") nil 'nomessage)
      (shell-command (combine-and-quote-strings (list "cd" backup-folder-test-repository "&&" git-binary-path "add" "fake-file" "&&" git-binary-path "commit" "-m" "' '")))
-     (should (eq (safe-length (git-backup--list-file-change-time git-binary-path backup-path git-output-format "/fake-file")) 3))
-     (dolist (row (git-backup--list-file-change-time git-binary-path backup-path git-output-format "/fake-file"))
+     (should (eq (safe-length (git-backup-list-file-change-time git-binary-path backup-path git-output-format "/fake-file")) 3))
+     (dolist (row (git-backup-list-file-change-time git-binary-path backup-path git-output-format "/fake-file"))
        (should (eq (string-match "[0-9a-f]+" (cdr row)) 0))))))
 
 (ert-deftest git-backup-fetch-backup-file-test ()
@@ -213,4 +213,4 @@
      (call-process-shell-command git-binary-path nil nil nil "init" backup-folder-test-repository)
      (write-region "" nil (concat backup-folder-test-repository "/ôëàèéü") nil 'nomessage)
      (shell-command (combine-and-quote-strings (list "cd" backup-folder-test-repository "&&" git-binary-path "add" "ôëàèéü" "&&" git-binary-path "commit" "-m" "' '")))
-     (should (eq (safe-length (git-backup--list-file-change-time git-binary-path backup-path git-output-format "/ôëàèéü")) 1)))))
+     (should (eq (safe-length (git-backup-list-file-change-time git-binary-path backup-path git-output-format "/ôëàèéü")) 1)))))
