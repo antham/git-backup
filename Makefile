@@ -4,7 +4,7 @@ EMACS_BATCH=$(EMACS_CLEAN) --batch
 CASK=cask
 PKG_DIR := $(shell ${CASK} package-directory)
 
-test: setup-tests unit-tests
+test: setup-tests unit-tests integration-tests
 
 setup-tests:
 	@echo "-- Test cleaning --"
@@ -13,6 +13,10 @@ setup-tests:
 unit-tests:
 	@echo "-- Running unit-tests --"
 	${CASK} exec ert-runner
+
+integration-tests:
+	@echo "-- Running integration tests --"
+	${CASK} exec ecukes
 
 downloads : download-cask-packages
 
