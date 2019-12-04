@@ -4,11 +4,7 @@ EMACS_BATCH=$(EMACS_CLEAN) --batch
 CASK=cask
 PKG_DIR := $(shell ${CASK} package-directory)
 
-test: setup-tests unit-tests integration-tests
-
-setup-tests:
-	@echo "-- Test cleaning --"
-	rm -f *.elc
+test: unit-tests integration-tests
 
 unit-tests:
 	@echo "-- Running unit-tests --"

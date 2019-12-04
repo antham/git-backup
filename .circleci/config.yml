@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: ubuntu
+
+    environment:
+      LC_ALL: fr_FR.UTF-8
+      LANG: fr_FR.UTF-8
+      LANGUAGE: fr_FR.UTF-8
+      TERM: screen
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: |
+            apt-get update
+            apt-get install -y emacs curl python git build-essential locales
+            curl -fsSkL https://raw.github.com/cask/cask/master/go | python
+            git config --global user.email "test@test.com"
+            git config --global user.name "test"
+            locale-gen --purge fr_FR.UTF-8
+      - run:
+          name: Run tests
+          command: |
+            export PATH="$HOME/.cask/bin:$PATH"
+            make downloads
+            make test
