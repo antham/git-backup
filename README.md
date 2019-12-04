@@ -1,6 +1,6 @@
 # Git-backup
 
-This project provides a library providing several helpers to implement a backup system on top of git.
+This library providing several helpers to implement a backup system on top of git.
 
 ## Dependencies
 
@@ -11,9 +11,9 @@ For emacs prior version 24.3 :
 
 * cl-lib (emacs library)
 
-## Documentation
+## Public functions documentation
 
-See the ```git-backup.el``` to get more details.
+See the ```git-backup.el``` internal documentation to get more details.
 
 ### git-backup-version-file
 
