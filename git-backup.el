@@ -43,7 +43,7 @@
     t))
 
 (defun git-backup-list-file-change-time (git-binary-path backup-path git-output-format filename)
-  "Build assoc list using commit id and message rendering format using FILENAME. GIT-BINARY-PATH is the absolute path where git stands, BACKUP-PATH is the path where backups are stored, GIT-OUTPUT-FORMAT follows format used by git in log command."
+  "Build assoc list using commit id and message rendering format for FILENAME. GIT-BINARY-PATH is the absolute path where git stands, BACKUP-PATH is the path where backups are stored, GIT-OUTPUT-FORMAT follows format used by git in log command."
   (let ((filename-for-git (git-backup--transform-filename-for-git filename)))
     (when (and filename
                (string= (s-chop-suffixes '("\0") (git-backup--exec-git-command git-binary-path backup-path (list "ls-files" "-z" filename-for-git) t))
