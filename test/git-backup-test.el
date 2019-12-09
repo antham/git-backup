@@ -1,6 +1,6 @@
 ;;; git-backup-test.el --- Test for git-backup
 
-;; Copyright (C) 2013 Anthony HAMON
+;; Copyright (C) 2019 Anthony HAMON
 
 ;; Author: Anthony HAMON
 ;; URL: http://github.com/antham/git-backup

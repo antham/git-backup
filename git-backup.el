@@ -1,10 +1,10 @@
 ;;; git-backup.el --- Backup each file change using git -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013-2019 Anthony HAMON
+;; Copyright (C) 2019 Anthony HAMON
 
 ;; Author: Anthony HAMON <hamon.anth@gmail.com>
 ;; URL: http://github.com/antham/git-backup
-;; Version: 1.0.0
+;; Version: 0.0.1
 ;; Package-Requires: ((s "1.8.0") (cl-lib "0"))
 ;; Keywords: backup, files, tools, git
 
