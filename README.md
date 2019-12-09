@@ -1,6 +1,6 @@
 # Git-backup [![CircleCI](https://circleci.com/gh/antham/git-backup.svg?style=svg)](https://circleci.com/gh/antham/git-backup) [![GitHub tag](https://img.shields.io/github/tag/antham/git-backup.svg)]() [![MELPA](http://melpa.org/packages/git-backup-badge.svg)](http://melpa.org/#/git-backup)
 
-This library providing several helpers to implement a backup system on top of git.
+This library provides several helpers to implement a backup system on top of git.
 
 ## Dependencies
 
