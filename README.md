@@ -7,10 +7,6 @@ This library providing several helpers to implement a backup system on top of gi
 - git (>= 1.5) (binary)
 - s (emacs library)
 
-For emacs prior version 24.3 :
-
-- cl-lib (emacs library)
-
 ## Public functions documentation
 
 See the `git-backup.el` internal documentation to get more details.
