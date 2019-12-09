@@ -39,8 +39,7 @@
     (git-backup--init-git-repository git-binary-path backup-path)
     (git-backup--copy-file-to-repository backup-path filename)
     (git-backup--exec-git-command git-binary-path backup-path (list "add" (git-backup--transform-filename-for-git filename)) t)
-    (git-backup--exec-git-command git-binary-path backup-path '("commit" "-m" "backup") t)
-    t))
+    (git-backup--exec-git-command git-binary-path backup-path '("commit" "-m" "backup") t) t))
 
 (defun git-backup-list-file-change-time (git-binary-path backup-path git-output-format filename)
   "Build assoc list using commit id and message rendering format for FILENAME. GIT-BINARY-PATH is the absolute path where git stands, BACKUP-PATH is the path where backups are stored, GIT-OUTPUT-FORMAT follows format used by git in log command."
@@ -139,8 +138,7 @@
                                                                                              "diff-tree"
                                                                                              "-s"
                                                                                              "--pretty=format:%cd"
-                                                                                             commit-id)
-                                                                                            t))))
+                                                                                             commit-id) t))))
             (mode major-mode))
         (with-current-buffer buffer
           (erase-buffer)
@@ -165,7 +163,7 @@
                                       "--tag-name-filter"
                                       "cat"
                                       "--"
-                                      "--all"))t)
+                                      "--all")) t)
 
 (provide 'git-backup)
 
