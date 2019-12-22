@@ -84,7 +84,7 @@
   "Initialize git repository. GIT-BINARY-PATH is the absolute path where git stands, BACKUP-PATH is the path where backups are stored."
   (unless (file-directory-p
            backup-path)
-    (call-process git-binary-path nil nil nil "init" backup-path)
+    (call-process git-binary-path nil nil nil "init" (expand-file-name backup-path))
     (git-backup--exec-git-command git-binary-path backup-path (list "config" "--local" "user.email" "noemail@noemail.com"))
     (git-backup--exec-git-command git-binary-path backup-path (list "config" "--local" "user.name" "noname"))))
 
