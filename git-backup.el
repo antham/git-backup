@@ -67,8 +67,11 @@
 
 (defun git-backup-replace-current-buffer (git-binary-path backup-path commit-id filename)
   "Replace current buffer with backup using COMMIT-ID and FILENAME. GIT-BINARY-PATH is the absolute path where git stands, BACKUP-PATH is the path where backups are stored."
-  (erase-buffer)
-  (insert (git-backup--fetch-backup-file git-binary-path backup-path commit-id filename)))
+  (let ((pt (point)))
+    (erase-buffer)
+    (insert (git-backup--fetch-backup-file git-binary-path backup-path commit-id filename))
+    (goto-char pt)
+    (recenter)))
 
 (defun git-backup-create-ediff (git-binary-path backup-path commit-id buffer)
   "Create a ediff buffer with backup using COMMIT-ID and existing BUFFER. GIT-BINARY-PATH is the absolute path where git stands, BACKUP-PATH is the path where backups are stored."
